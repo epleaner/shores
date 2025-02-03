@@ -3,6 +3,7 @@ import Config from '../core/Config.js'
 import ShootingStar from '../components/ShootingStar.js'
 import Rain from '../components/Rain.js'
 import GUI from '../core/GUI.js'
+import Experience from '../core/Experience.js'
 
 export default class MainScene {
     constructor(renderer) {
@@ -61,6 +62,9 @@ export default class MainScene {
         
         this.scene.add(this.sphere)
 
+        // Store camera reference from Experience
+        this.camera = new Experience().camera.camera
+        
         // Initialize arrays for effects
         this.shootingStars = []
         this.rain = []
@@ -113,8 +117,12 @@ export default class MainScene {
 
         // Update rain
         if (this.effectsEnabled.rain) {
-            if (Math.random() < Config.rain.spawnRate) {
-                this.rain.push(new Rain(this.scene))
+            // Keep spawning until we reach the desired count, but limit per frame
+            const spawnCount = Math.min(10, Config.rain.count - this.rain.length)
+            for (let i = 0; i < spawnCount; i++) {
+                if (Math.random() < Config.rain.spawnRate) {
+                    this.rain.push(new Rain(this.scene, this.camera))
+                }
             }
 
             for (let i = this.rain.length - 1; i >= 0; i--) {

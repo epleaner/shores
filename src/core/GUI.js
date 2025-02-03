@@ -44,16 +44,21 @@ export default class GUI {
 
         // Rain folder
         const rainFolder = this.gui.addFolder('Rain')
-        rainFolder.add(Config.rain, 'spawnRate', 0, 0.2).name('Spawn Rate')
-        rainFolder.add(Config.rain, 'radius', 100, 2000).name('Distance')
-        rainFolder.add(Config.rain, 'size', 0.1, 5).name('Size')
+        rainFolder.add(Config.rain, 'spawnRate', 0, 1).name('Spawn Rate')
+        rainFolder.add(Config.rain, 'size', 0.1, 1).name('Size')
         rainFolder.add(Config.rain, 'speed', 1, 50).name('Speed')
-        rainFolder.add(Config.rain, 'trailLength', 1, 50).name('Trail Length')
+        rainFolder.add(Config.rain, 'trailLength', 0.1, 5).name('Trail Length')
+        rainFolder.add(Config.rain, 'count', 100, 2000).step(100).name('Max Drops')
+        
+        const rainSpreadFolder = rainFolder.addFolder('Spread Settings')
+        rainSpreadFolder.add(Config.rain.spread, 'x', 10, 200).name('Spread X')
+        rainSpreadFolder.add(Config.rain.spread, 'z', 10, 200).name('Spread Z')
+        rainSpreadFolder.add(Config.rain, 'height', 10, 200).name('Height')
 
         const rainLightFolder = rainFolder.addFolder('Light Settings')
-        rainLightFolder.add(Config.rain.lightIntensity, 'min', 0, 10).name('Min Intensity')
-        rainLightFolder.add(Config.rain.lightIntensity, 'max', 0, 10).name('Max Intensity')
-        rainLightFolder.add(Config.rain, 'lightRange', 100, 1000).name('Light Range')
+        rainLightFolder.add(Config.rain.lightIntensity, 'min', 0, 1).name('Min Intensity')
+        rainLightFolder.add(Config.rain.lightIntensity, 'max', 0, 1).name('Max Intensity')
+        rainLightFolder.add(Config.rain, 'lightRange', 10, 200).name('Light Range')
 
         const rainFadeFolder = rainFolder.addFolder('Fade Settings')
         rainFadeFolder.add(Config.rain.fadeSpeed, 'min', 0.001, 0.05).name('Min Fade Speed')

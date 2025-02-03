@@ -25,19 +25,24 @@ export default {
         trailLength: 10     // Adjusted trail length
     },
     rain: {
-        spawnRate: 0.02,
-        radius: 800,
-        size: 0.5,
-        speed: 15,
+        spawnRate: 0.11,
+        size: .89,
+        speed: 4,           // Slightly slower for better visibility
         lightIntensity: {
-            min: 2,
-            max: 4
+            min: 0.05,
+            max: 0.1
         },
-        lightRange: 400,
+        lightRange: 50,
         fadeSpeed: {
-            min: 0.004,
-            max: 0.007
+            min: 0.01,
+            max: 0.02
         },
-        trailLength: 20
+        trailLength: 5,      // Slightly longer trails
+        spread: {
+            x: 100,          // Wider spread
+            z: 100
+        },
+        height: 80,          // Higher spawn point
+        count: 500           // More raindrops
     }
 } 

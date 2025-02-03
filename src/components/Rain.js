@@ -2,29 +2,33 @@ import * as THREE from 'three'
 import Config from '../core/Config.js'
 
 export default class Rain {
-    constructor(scene) {
+    constructor(scene, camera) {
         this.scene = scene
+        this.camera = camera
         
-        // Create the rain drop trail
+        // Create the raindrop trail pointing downward
         const points = []
         points.push(new THREE.Vector3(0, 0, 0))
-        points.push(new THREE.Vector3(0, 0, -Config.rain.trailLength))
+        points.push(new THREE.Vector3(0, -Config.rain.trailLength, 0)) // Trail points down
         
         const dropGeometry = new THREE.BufferGeometry().setFromPoints(points)
         const dropMaterial = new THREE.LineBasicMaterial({
             color: 0xffffff,
             transparent: true,
-            opacity: 1
+            opacity: 0.3
         })
         this.mesh = new THREE.Line(dropGeometry, dropMaterial)
         
-        // Create light with random intensity
+        // Rotate the mesh 180 degrees so the trail follows the drop
+        this.mesh.rotation.x = Math.PI
+        
+        // Subtle light
         const randomIntensity = THREE.MathUtils.randFloat(
             Config.rain.lightIntensity.min,
             Config.rain.lightIntensity.max
         )
         this.light = new THREE.PointLight(
-            0xffffff, 
+            0xffffff,  // Changed to white
             randomIntensity,
             Config.rain.lightRange
         )
@@ -46,32 +50,31 @@ export default class Rain {
     }
 
     initializePosition() {
-        // Random angle around the sky dome, but only in the upper hemisphere
-        const theta = Math.random() * Math.PI * 2 // Full 360 degrees around
-        const phi = Math.random() * Math.PI * 0.3 + Math.PI * 0.2
-        const radius = Config.rain.radius
-
-        // Convert spherical to cartesian coordinates
-        const x = radius * Math.cos(phi) * Math.cos(theta)
-        const z = radius * Math.cos(phi) * Math.sin(theta)
-        const y = radius * Math.sin(phi)
+        // Get a position in a box above the player, but maintain world-space up direction
+        const cameraPos = this.camera.position
+        
+        // Calculate spawn box dimensions
+        const spread = Config.rain.spread
+        const height = Config.rain.height
+        
+        // Random position in world space, centered on player's xz position
+        const x = cameraPos.x + (Math.random() - 0.5) * spread.x
+        const y = cameraPos.y + height // Always spawn above player
+        const z = cameraPos.z + (Math.random() - 0.5) * spread.z
 
         this.mesh.position.set(x, y, z)
         this.light.position.copy(this.mesh.position)
     }
 
     initializeVelocity() {
-        // More diagonal trajectory
+        // Always fall straight down in world space
         this.velocity = new THREE.Vector3(
-            (Math.random() - 0.5) * 2,
-            -Math.random() - 0.5,
-            (Math.random() - 0.5) * 2
-        ).normalize().multiplyScalar(Config.rain.speed)
-
-        // Orient the trail along the velocity
-        this.mesh.lookAt(
-            this.mesh.position.clone().add(this.velocity)
+            0,                      // No horizontal movement
+            -Config.rain.speed,     // Straight down
+            0                       // No horizontal movement
         )
+
+        // No need to orient the trail since it's already pointing in the right direction
     }
 
     update() {
@@ -81,10 +84,12 @@ export default class Rain {
 
         // Update life and opacity
         this.life -= this.fadeSpeed
-        this.mesh.material.opacity = this.life
+        this.mesh.material.opacity = this.life * 0.3
         this.light.intensity = this.life * this.maxIntensity
 
-        return this.life > 0
+        // Remove if too low or faded out
+        const minY = this.camera.position.y - Config.rain.height // Remove when below player
+        return this.life > 0 && this.mesh.position.y > minY
     }
 
     dispose() {
