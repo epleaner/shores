@@ -45,7 +45,35 @@ export default class Experience {
     setupControls() {
         // Click to start
         document.addEventListener('click', () => {
-            this.controls.lock()
+            // Only lock if we're not in GUI mode
+            if (!this.guiMode) {
+                this.controls.lock()
+            }
+        })
+
+        // Toggle between GUI and camera controls
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Backquote') { // ` key
+                if (this.controls.isLocked) {
+                    this.controls.unlock()
+                    this.guiMode = true
+                } else {
+                    this.guiMode = false
+                }
+            }
+        })
+
+        // Listen for lock/unlock events
+        document.addEventListener('pointerlockchange', () => {
+            if (document.pointerLockElement === document.body) {
+                this.guiMode = false
+            } else if (!this.guiMode) {
+                // Only reset if we're not explicitly in GUI mode
+                this.moveForward = false
+                this.moveBackward = false
+                this.moveLeft = false
+                this.moveRight = false
+            }
         })
 
         // Custom mouse movement handler
@@ -73,44 +101,48 @@ export default class Experience {
 
         // Movement keys
         document.addEventListener('keydown', (event) => {
-            switch (event.code) {
-                case 'ArrowUp':
-                case 'KeyW':
-                    this.moveForward = true
-                    break
-                case 'ArrowDown':
-                case 'KeyS':
-                    this.moveBackward = true
-                    break
-                case 'ArrowLeft':
-                case 'KeyA':
-                    this.moveLeft = true
-                    break
-                case 'ArrowRight':
-                case 'KeyD':
-                    this.moveRight = true
-                    break
+            if (!this.guiMode) {
+                switch (event.code) {
+                    case 'ArrowUp':
+                    case 'KeyW':
+                        this.moveForward = true
+                        break
+                    case 'ArrowDown':
+                    case 'KeyS':
+                        this.moveBackward = true
+                        break
+                    case 'ArrowLeft':
+                    case 'KeyA':
+                        this.moveLeft = true
+                        break
+                    case 'ArrowRight':
+                    case 'KeyD':
+                        this.moveRight = true
+                        break
+                }
             }
         })
 
         document.addEventListener('keyup', (event) => {
-            switch (event.code) {
-                case 'ArrowUp':
-                case 'KeyW':
-                    this.moveForward = false
-                    break
-                case 'ArrowDown':
-                case 'KeyS':
-                    this.moveBackward = false
-                    break
-                case 'ArrowLeft':
-                case 'KeyA':
-                    this.moveLeft = false
-                    break
-                case 'ArrowRight':
-                case 'KeyD':
-                    this.moveRight = false
-                    break
+            if (!this.guiMode) {
+                switch (event.code) {
+                    case 'ArrowUp':
+                    case 'KeyW':
+                        this.moveForward = false
+                        break
+                    case 'ArrowDown':
+                    case 'KeyS':
+                        this.moveBackward = false
+                        break
+                    case 'ArrowLeft':
+                    case 'KeyA':
+                        this.moveLeft = false
+                        break
+                    case 'ArrowRight':
+                    case 'KeyD':
+                        this.moveRight = false
+                        break
+                }
             }
         })
     }

@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import Config from '../core/Config.js'
 import ShootingStar from '../components/ShootingStar.js'
+import Rain from '../components/Rain.js'
+import GUI from '../core/GUI.js'
 
 export default class MainScene {
     constructor(renderer) {
@@ -61,22 +63,68 @@ export default class MainScene {
 
         // Initialize arrays for effects
         this.shootingStars = []
+        this.rain = []
+        
+        // Effect states
+        this.effectsEnabled = {
+            shootingStars: true,
+            rain: false
+        }
+
+        // Initialize GUI
+        this.gui = new GUI(this)
+    }
+
+    toggleShootingStars(enabled) {
+        this.effectsEnabled.shootingStars = enabled
+        if (!enabled) {
+            // Remove all existing shooting stars
+            this.shootingStars.forEach(star => star.dispose())
+            this.shootingStars = []
+        }
+    }
+
+    toggleRain(enabled) {
+        this.effectsEnabled.rain = enabled
+        if (!enabled) {
+            // Remove all existing rain drops
+            this.rain.forEach(drop => drop.dispose())
+            this.rain = []
+        }
     }
 
     update() {
-        // Create new shooting stars
-        if (Math.random() < Config.shootingStars.spawnRate) {
-            this.shootingStars.push(new ShootingStar(this.scene))
+        // Update shooting stars
+        if (this.effectsEnabled.shootingStars) {
+            if (Math.random() < Config.shootingStars.spawnRate) {
+                this.shootingStars.push(new ShootingStar(this.scene))
+            }
+
+            for (let i = this.shootingStars.length - 1; i >= 0; i--) {
+                const star = this.shootingStars[i]
+                const isAlive = star.update()
+                
+                if (!isAlive) {
+                    star.dispose()
+                    this.shootingStars.splice(i, 1)
+                }
+            }
         }
 
-        // Update and cleanup shooting stars
-        for (let i = this.shootingStars.length - 1; i >= 0; i--) {
-            const star = this.shootingStars[i]
-            const isAlive = star.update()
-            
-            if (!isAlive) {
-                star.dispose()
-                this.shootingStars.splice(i, 1)
+        // Update rain
+        if (this.effectsEnabled.rain) {
+            if (Math.random() < Config.rain.spawnRate) {
+                this.rain.push(new Rain(this.scene))
+            }
+
+            for (let i = this.rain.length - 1; i >= 0; i--) {
+                const drop = this.rain[i]
+                const isAlive = drop.update()
+                
+                if (!isAlive) {
+                    drop.dispose()
+                    this.rain.splice(i, 1)
+                }
             }
         }
     }
