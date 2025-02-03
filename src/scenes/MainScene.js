@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import Config from '../core/Config.js'
+import ShootingStar from '../components/ShootingStar.js'
 
 export default class MainScene {
     constructor(renderer) {
@@ -57,10 +58,27 @@ export default class MainScene {
         this.sphere.position.y = -radius + 1.5
         
         this.scene.add(this.sphere)
+
+        // Initialize arrays for effects
+        this.shootingStars = []
     }
 
     update() {
-        // Empty update method (will be called by Experience)
+        // Create new shooting stars
+        if (Math.random() < Config.shootingStars.spawnRate) {
+            this.shootingStars.push(new ShootingStar(this.scene))
+        }
+
+        // Update and cleanup shooting stars
+        for (let i = this.shootingStars.length - 1; i >= 0; i--) {
+            const star = this.shootingStars[i]
+            const isAlive = star.update()
+            
+            if (!isAlive) {
+                star.dispose()
+                this.shootingStars.splice(i, 1)
+            }
+        }
     }
 
     // Helper to get position on sphere surface

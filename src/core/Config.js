@@ -7,5 +7,37 @@ export default {
         sphereRadius: 100,
         visibleSectionAngle: Math.PI / 6,
         visibleSectionSize: 50
+    },
+    shootingStars: {
+        spawnRate: 0.05,
+        radius: 750,         // Adjusted for better visibility
+        size: 1,
+        speed: 5,           // Adjusted for tangential movement
+        lightIntensity: {
+            min: 300,
+            max: 400
+        },
+        lightRange: 6000,
+        fadeSpeed: {
+            min: 0.006,
+            max: 0.01
+        },
+        trailLength: 10     // Adjusted trail length
+    },
+    rain: {
+        spawnRate: 0.02,
+        radius: 800,
+        size: 0.5,
+        speed: 15,
+        lightIntensity: {
+            min: 2,
+            max: 4
+        },
+        lightRange: 400,
+        fadeSpeed: {
+            min: 0.004,
+            max: 0.007
+        },
+        trailLength: 20
     }
 } 
