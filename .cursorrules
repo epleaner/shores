@@ -1,0 +1,41 @@
+/ ThreeJS Project Architecture Guide
+
+// Core Principles
+- Keep it simple (KISS): Start with basic structure, add complexity only when needed
+- Follow SOLID principles for maintainable code
+- Focus on readability and clear organization
+
+// Project Structure
+/src
+  /core          // Core setup (renderer, camera, scene)
+  /scenes        // Different scenes/experiences
+  /components    // Reusable 3D elements
+  /utils         // Helper functions
+  /materials     // Custom materials/shaders
+  /controls      // User interactions
+
+// Key Best Practices
+1. Organization
+- One class = one responsibility
+- Keep files small and focused
+- Use clear, descriptive names
+- Comment complex logic
+
+2. Performance
+- Clean up unused resources
+- Use simple geometries when possible
+- Be careful with lights and shadows
+- Implement proper dispose methods
+
+3. Development
+- Implement debug mode
+- Handle window resizing
+- Add error handling
+
+4. Code Quality
+- Write reusable components
+- Implement proper cleanup
+
+Remember:
+- Start simple, add features gradually
+- Document your code

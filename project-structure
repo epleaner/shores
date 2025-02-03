@@ -1,0 +1,11 @@
+/src
+  /core
+    Experience.js    # Main Three.js setup
+    Renderer.js      # Renderer configuration
+    Camera.js        # Camera setup
+  /scenes
+    MainScene.js     # Our first scene
+  index.html
+  main.js
+  style.css
+vite.config.js 
