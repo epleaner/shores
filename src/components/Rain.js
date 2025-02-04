@@ -1,101 +1,135 @@
-import * as THREE from 'three'
-import Config from '../core/Config.js'
+import * as THREE from 'three';
+import Config from '../core/Config.js';
+import {
+  vertexShader,
+  fragmentShader,
+} from '../materials/shaders/rain/shaders.js';
 
 export default class Rain {
-    constructor(scene, camera) {
-        this.scene = scene
-        this.camera = camera
-        
-        // Create the raindrop trail pointing downward
-        const points = []
-        points.push(new THREE.Vector3(0, 0, 0))
-        points.push(new THREE.Vector3(0, -Config.rain.trailLength, 0)) // Trail points down
-        
-        const dropGeometry = new THREE.BufferGeometry().setFromPoints(points)
-        const dropMaterial = new THREE.LineBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.3
-        })
-        this.mesh = new THREE.Line(dropGeometry, dropMaterial)
-        
-        // Rotate the mesh 180 degrees so the trail follows the drop
-        this.mesh.rotation.x = Math.PI
-        
-        // Subtle light
-        const randomIntensity = THREE.MathUtils.randFloat(
-            Config.rain.lightIntensity.min,
-            Config.rain.lightIntensity.max
-        )
-        this.light = new THREE.PointLight(
-            0xffffff,  // Changed to white
-            randomIntensity,
-            Config.rain.lightRange
-        )
-        
-        // Initialize properties
-        this.life = 1.0
-        this.fadeSpeed = THREE.MathUtils.randFloat(
-            Config.rain.fadeSpeed.min,
-            Config.rain.fadeSpeed.max
-        )
-        this.maxIntensity = randomIntensity
-        
-        this.initializePosition()
-        this.initializeVelocity()
-        
-        // Add to scene
-        this.scene.add(this.mesh)
-        this.scene.add(this.light)
+  constructor(scene, camera) {
+    this.scene = scene;
+    this.camera = camera;
+    this.count = Config.rain.count;
+
+    this.initRainSystem();
+  }
+
+  initRainSystem() {
+    // Create geometry for points
+    const geometry = new THREE.BufferGeometry();
+
+    // Generate random positions within the spawn box
+    const positions = new Float32Array(this.count * 3);
+    const sizes = new Float32Array(this.count);
+    const randomness = new Float32Array(this.count);
+    const fadeOffsets = new Float32Array(this.count);
+
+    for (let i = 0; i < this.count; i++) {
+      const i3 = i * 3;
+
+      // Random position in spawn box
+      positions[i3] = (Math.random() - 0.5) * Config.rain.spread.x;
+      positions[i3 + 1] = Math.random() * Config.rain.height;
+      positions[i3 + 2] = (Math.random() - 0.5) * Config.rain.spread.z;
+
+      sizes[i] = Config.rain.size;
+      randomness[i] = Math.random();
+      fadeOffsets[i] = Math.random();
     }
 
-    initializePosition() {
-        // Get a position in a box above the player, but maintain world-space up direction
-        const cameraPos = this.camera.position
-        
-        // Calculate spawn box dimensions
-        const spread = Config.rain.spread
-        const height = Config.rain.height
-        
-        // Random position in world space, centered on player's xz position
-        const x = cameraPos.x + (Math.random() - 0.5) * spread.x
-        const y = cameraPos.y + height // Always spawn above player
-        const z = cameraPos.z + (Math.random() - 0.5) * spread.z
+    // Create line geometry (two vertices per raindrop)
+    const linePositions = new Float32Array(this.count * 6); // 2 points per line * 3 coordinates
+    const lineSizes = new Float32Array(this.count * 2);
+    const lineRandomness = new Float32Array(this.count * 2);
+    const lineFadeOffsets = new Float32Array(this.count * 2);
 
-        this.mesh.position.set(x, y, z)
-        this.light.position.copy(this.mesh.position)
+    for (let i = 0; i < this.count; i++) {
+      const i6 = i * 6;
+      const i2 = i * 2;
+      const i3 = i * 3;
+
+      // Copy position to both start and end points
+      linePositions[i6] = positions[i3];
+      linePositions[i6 + 1] = positions[i3 + 1];
+      linePositions[i6 + 2] = positions[i3 + 2];
+      linePositions[i6 + 3] = positions[i3];
+      linePositions[i6 + 4] = positions[i3 + 1];
+      linePositions[i6 + 5] = positions[i3 + 2];
+
+      // Copy attributes to both vertices
+      lineSizes[i2] = sizes[i];
+      lineSizes[i2 + 1] = sizes[i];
+      lineRandomness[i2] = randomness[i];
+      lineRandomness[i2 + 1] = randomness[i];
+      lineFadeOffsets[i2] = fadeOffsets[i];
+      lineFadeOffsets[i2 + 1] = fadeOffsets[i];
     }
 
-    initializeVelocity() {
-        // Always fall straight down in world space
-        this.velocity = new THREE.Vector3(
-            0,                      // No horizontal movement
-            -Config.rain.speed,     // Straight down
-            0                       // No horizontal movement
-        )
+    // Set up geometries
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    geometry.setAttribute(
+      'randomness',
+      new THREE.BufferAttribute(randomness, 1)
+    );
+    geometry.setAttribute(
+      'fadeOffset',
+      new THREE.BufferAttribute(fadeOffsets, 1)
+    );
 
-        // No need to orient the trail since it's already pointing in the right direction
+    const lineGeometry = new THREE.BufferGeometry();
+    lineGeometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(linePositions, 3)
+    );
+    lineGeometry.setAttribute('size', new THREE.BufferAttribute(lineSizes, 1));
+    lineGeometry.setAttribute(
+      'randomness',
+      new THREE.BufferAttribute(lineRandomness, 1)
+    );
+    lineGeometry.setAttribute(
+      'fadeOffset',
+      new THREE.BufferAttribute(lineFadeOffsets, 1)
+    );
+
+    // Create material
+    this.material = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uSpeed: { value: Config.rain.speed },
+        uHeight: { value: Config.rain.height },
+        uPlayerPosition: { value: this.camera.position },
+      },
+      vertexShader,
+      fragmentShader,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+
+    // Create points and lines
+    this.points = new THREE.Points(geometry, this.material);
+    this.lines = new THREE.LineSegments(lineGeometry, this.material);
+
+    this.scene.add(this.points);
+    this.scene.add(this.lines);
+  }
+
+  update() {
+    if (!this.material) return;
+
+    // Update uniforms
+    this.material.uniforms.uTime.value += 0.016;
+    this.material.uniforms.uPlayerPosition.value.copy(this.camera.position);
+  }
+
+  dispose() {
+    if (this.points) {
+      this.scene.remove(this.points);
+      this.scene.remove(this.lines);
+      this.points.geometry.dispose();
+      this.lines.geometry.dispose();
+      this.material.dispose();
     }
-
-    update() {
-        // Update position
-        this.mesh.position.add(this.velocity)
-        this.light.position.copy(this.mesh.position)
-
-        // Update life and opacity
-        this.life -= this.fadeSpeed
-        this.mesh.material.opacity = this.life * 0.3
-        this.light.intensity = this.life * this.maxIntensity
-
-        // Remove if too low or faded out
-        const minY = this.camera.position.y - Config.rain.height // Remove when below player
-        return this.life > 0 && this.mesh.position.y > minY
-    }
-
-    dispose() {
-        this.scene.remove(this.mesh)
-        this.scene.remove(this.light)
-        this.mesh.geometry.dispose()
-        this.mesh.material.dispose()
-    }
-} 
+  }
+}
