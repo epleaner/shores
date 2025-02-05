@@ -12,11 +12,11 @@ export default class MainScene {
     this.scene.background = new THREE.Color(0x000000); // Pure black background
 
     // Add more ambient light for better diffusion
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2); // Increased from 0.05 to 0.2
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9); // Increased from 0.05 to 0.2
     this.scene.add(ambientLight);
 
     // Create visible sun sphere - much larger and farther away
-    const sunGeometry = new THREE.SphereGeometry(20, 32, 32);
+    const sunGeometry = new THREE.SphereGeometry(0, 32, 32);
     const sunMaterial = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
@@ -27,7 +27,7 @@ export default class MainScene {
     this.scene.add(sun);
 
     // Add light from the sun position
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 0.1);
     sunLight.position.copy(sun.position);
     this.scene.add(sunLight);
 

@@ -1,7 +1,7 @@
 export default {
   player: {
     headHeight: 8.5,
-    moveSpeed: 0.1,
+    moveSpeed: 0.5,
   },
   world: {
     sphereRadius: 100,
