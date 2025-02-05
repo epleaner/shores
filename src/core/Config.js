@@ -8,6 +8,13 @@ export default {
     visibleSectionAngle: Math.PI / 6,
     visibleSectionSize: 50,
   },
+  waves: {
+    speed: 0.3,
+    frequency: 0.08,
+    amplitude: 0.4,
+    opacity: 0.85,
+    color: '#000205', // Very dark blue-black
+  },
   shootingStars: {
     spawnRate: 0.05,
     radius: 750, // Adjusted for better visibility

@@ -14,6 +14,7 @@ export default class GUI {
     const effects = {
       shootingStars: false,
       rain: true,
+      waves: true,
     };
     effectsFolder.add(effects, 'shootingStars').onChange((value) => {
       this.scene.toggleShootingStars(value);
@@ -21,7 +22,44 @@ export default class GUI {
     effectsFolder.add(effects, 'rain').onChange((value) => {
       this.scene.toggleRain(value);
     });
+    effectsFolder.add(effects, 'waves').onChange((value) => {
+      this.scene.toggleWaves(value);
+    });
     effectsFolder.open();
+
+    // Waves folder
+    const wavesFolder = this.gui.addFolder('Waves');
+    wavesFolder
+      .add(Config.waves, 'speed', 0.1, 2)
+      .name('Speed')
+      .onChange(() => {
+        this.scene.waves?.material.updateUniforms();
+      });
+    wavesFolder
+      .add(Config.waves, 'frequency', 0.01, 0.5)
+      .name('Frequency')
+      .onChange(() => {
+        this.scene.waves?.material.updateUniforms();
+      });
+    wavesFolder
+      .add(Config.waves, 'amplitude', 0.1, 2)
+      .name('Height')
+      .onChange(() => {
+        this.scene.waves?.material.updateUniforms();
+      });
+    wavesFolder
+      .add(Config.waves, 'opacity', 0, 1)
+      .name('Opacity')
+      .onChange(() => {
+        this.scene.waves?.material.updateUniforms();
+      });
+    wavesFolder
+      .addColor(Config.waves, 'color')
+      .name('Color')
+      .onChange(() => {
+        this.scene.waves?.material.updateUniforms();
+      });
+    wavesFolder.open();
 
     // Shooting stars folder
     const starsFolder = this.gui.addFolder('Shooting Stars');

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import Config from '../core/Config.js';
 import ShootingStar from '../components/ShootingStar.js';
 import Rain from '../components/Rain.js';
+import Waves from '../components/Waves.js';
 import GUI from '../core/GUI.js';
 import Experience from '../core/Experience.js';
 
@@ -73,7 +74,11 @@ export default class MainScene {
     this.effectsEnabled = {
       shootingStars: false,
       rain: true,
+      waves: true,
     };
+
+    // Add waves
+    this.waves = new Waves(this.scene, Config.world.sphereRadius * 1.5);
 
     // Initialize GUI
     this.gui = new GUI(this);
@@ -94,6 +99,13 @@ export default class MainScene {
       // Remove all existing rain drops
       this.rain.forEach((drop) => drop.dispose());
       this.rain = [];
+    }
+  }
+
+  toggleWaves(enabled) {
+    this.effectsEnabled.waves = enabled;
+    if (this.waves) {
+      this.waves.mesh.visible = enabled;
     }
   }
 
@@ -126,6 +138,11 @@ export default class MainScene {
       if (this.rainSystem) {
         this.rainSystem.update();
       }
+    }
+
+    // Update waves
+    if (this.effectsEnabled.waves && this.waves) {
+      this.waves.update(performance.now() * 0.001);
     }
   }
 
