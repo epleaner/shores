@@ -9,11 +9,11 @@ export default {
     visibleSectionSize: 50,
   },
   waves: {
-    speed: 0.3,
-    frequency: 0.08,
-    amplitude: 0.4,
-    opacity: 0.85,
-    color: '#000205', // Very dark blue-black
+    speed: 0.5,        // Faster speed for more movement
+    frequency: 0.144,   // Higher frequency for more rings
+    amplitude: 0.4,    // Amplitude doesn't affect 2D waves much now
+    opacity: 1,     // Lower opacity for more subtle white lines
+    color: '#ffffff',  // Pure white color
   },
   shootingStars: {
     spawnRate: 0.05,
