@@ -12,9 +12,12 @@ export default class WavesMaterial extends THREE.ShaderMaterial {
         uTime: { value: 0 },
         uWaveSpeed: { value: Config.waves.speed },
         uWaveFrequency: { value: Config.waves.frequency },
-        uWaveAmplitude: { value: Config.waves.amplitude },
         uWaterColor: { value: new THREE.Color(Config.waves.color) },
         uOpacity: { value: Config.waves.opacity },
+        uThickness: { value: Config.waves.thickness },
+        uNoiseStrength: { value: Config.waves.noiseStrength },
+        uNoiseScale: { value: Config.waves.noiseScale },
+        uNoiseSpeed: { value: Config.waves.noiseSpeed },
       },
     });
   }
@@ -26,8 +29,11 @@ export default class WavesMaterial extends THREE.ShaderMaterial {
   updateUniforms() {
     this.uniforms.uWaveSpeed.value = Config.waves.speed;
     this.uniforms.uWaveFrequency.value = Config.waves.frequency;
-    this.uniforms.uWaveAmplitude.value = Config.waves.amplitude;
     this.uniforms.uWaterColor.value.set(Config.waves.color);
     this.uniforms.uOpacity.value = Config.waves.opacity;
+    this.uniforms.uThickness.value = Config.waves.thickness;
+    this.uniforms.uNoiseStrength.value = Config.waves.noiseStrength;
+    this.uniforms.uNoiseScale.value = Config.waves.noiseScale;
+    this.uniforms.uNoiseSpeed.value = Config.waves.noiseSpeed;
   }
 }

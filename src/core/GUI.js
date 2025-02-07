@@ -25,7 +25,6 @@ export default class GUI {
     effectsFolder.add(effects, 'waves').onChange((value) => {
       this.scene.toggleWaves(value);
     });
-    effectsFolder.open();
 
     // Waves folder
     const wavesFolder = this.gui.addFolder('Waves');
@@ -42,14 +41,34 @@ export default class GUI {
         this.scene.waves?.material.updateUniforms();
       });
     wavesFolder
-      .add(Config.waves, 'amplitude', 0.1, 2)
-      .name('Height')
+      .add(Config.waves, 'opacity', 0, 1)
+      .name('Opacity')
       .onChange(() => {
         this.scene.waves?.material.updateUniforms();
       });
     wavesFolder
-      .add(Config.waves, 'opacity', 0, 1)
-      .name('Opacity')
+      .add(Config.waves, 'thickness', 0.0001, 0.01)
+      .name('Line Thickness')
+      .onChange(() => {
+        this.scene.waves?.material.updateUniforms();
+      });
+    
+    const waveNoiseFolder = wavesFolder.addFolder('Noise Settings');
+    waveNoiseFolder
+      .add(Config.waves, 'noiseStrength', 0, 20)
+      .name('Distortion Amount')
+      .onChange(() => {
+        this.scene.waves?.material.updateUniforms();
+      });
+    waveNoiseFolder
+      .add(Config.waves, 'noiseScale', 0.01, 0.2)
+      .name('Pattern Size')
+      .onChange(() => {
+        this.scene.waves?.material.updateUniforms();
+      });
+    waveNoiseFolder
+      .add(Config.waves, 'noiseSpeed', 0, 1)
+      .name('Noise Speed')
       .onChange(() => {
         this.scene.waves?.material.updateUniforms();
       });
@@ -59,7 +78,6 @@ export default class GUI {
       .onChange(() => {
         this.scene.waves?.material.updateUniforms();
       });
-    wavesFolder.open();
 
     // Shooting stars folder
     const starsFolder = this.gui.addFolder('Shooting Stars');
@@ -92,19 +110,29 @@ export default class GUI {
       .add(Config.shootingStars.fadeSpeed, 'max', 0.001, 0.05)
       .name('Max Fade Speed');
 
-    starsFolder.open();
 
     // Rain folder
     const rainFolder = this.gui.addFolder('Rain');
     rainFolder.add(Config.rain, 'spawnRate', 0, 1).name('Spawn Rate');
-    rainFolder.add(Config.rain, 'size', 0.1, 1).name('Size');
-    rainFolder.add(Config.rain, 'speed', 1, 50).name('Speed');
+    rainFolder.add(Config.rain, 'size', 0.1, 1).name('Size').onChange(() => {
+      this.scene.rainSystem?.updateAttributes();
+    });
+    rainFolder.add(Config.rain, 'speed', 1, 50).name('Speed').onChange(() => {
+      this.scene.rainSystem?.updateUniforms();
+    });
     rainFolder.add(Config.rain, 'count', 100, 5000).step(100).name('Max Drops');
 
     const rainSpreadFolder = rainFolder.addFolder('Spread Settings');
-    rainSpreadFolder.add(Config.rain.spread, 'x', 10, 200).name('Spread X');
-    rainSpreadFolder.add(Config.rain.spread, 'z', 10, 200).name('Spread Z');
-    rainSpreadFolder.add(Config.rain, 'height', 10, 200).name('Height');
+    rainSpreadFolder.add(Config.rain.spread, 'x', 10, 200).name('Spread X').onChange(() => {
+      this.scene.rainSystem?.updateAttributes();
+    });
+    rainSpreadFolder.add(Config.rain.spread, 'z', 10, 200).name('Spread Z').onChange(() => {
+      this.scene.rainSystem?.updateAttributes();
+    });
+    rainSpreadFolder.add(Config.rain, 'height', 10, 200).name('Height').onChange(() => {
+      this.scene.rainSystem?.updateUniforms();
+      this.scene.rainSystem?.updateAttributes();
+    });
 
     const rainLightFolder = rainFolder.addFolder('Light Settings');
     rainLightFolder

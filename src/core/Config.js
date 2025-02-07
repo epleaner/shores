@@ -10,10 +10,13 @@ export default {
   },
   waves: {
     speed: 0.5,        // Faster speed for more movement
-    frequency: 0.144,   // Higher frequency for more rings
-    amplitude: 0.4,    // Amplitude doesn't affect 2D waves much now
-    opacity: 1,     // Lower opacity for more subtle white lines
+    frequency: 0.04,   // Higher frequency for more rings
+    opacity: 1,        // Lower opacity for more subtle white lines
     color: '#ffffff',  // Pure white color
+    thickness: 0.001,  // Controls the thickness of the wave lines
+    noiseStrength: 5.0,    // How much the noise distorts the waves
+    noiseScale: 0.05,      // Size of the noise pattern
+    noiseSpeed: 0.2,       // Speed of noise animation
   },
   shootingStars: {
     spawnRate: 0.05,
@@ -34,7 +37,7 @@ export default {
   rain: {
     spawnRate: 0.11,
     size: 0.2,
-    speed: 8,
+    speed: 2.3,
     lightIntensity: {
       min: 0.05,
       max: 0.1,
@@ -49,6 +52,6 @@ export default {
       z: 300,
     },
     height: 100,
-    count: 12000,
+    count: 6000,
   },
 };

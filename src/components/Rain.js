@@ -24,18 +24,7 @@ export default class Rain {
     const randomness = new Float32Array(this.count);
     const fadeOffsets = new Float32Array(this.count);
 
-    for (let i = 0; i < this.count; i++) {
-      const i3 = i * 3;
-
-      // Random position in spawn box
-      positions[i3] = (Math.random() - 0.5) * Config.rain.spread.x;
-      positions[i3 + 1] = Math.random() * Config.rain.height;
-      positions[i3 + 2] = (Math.random() - 0.5) * Config.rain.spread.z;
-
-      sizes[i] = Config.rain.size;
-      randomness[i] = Math.random();
-      fadeOffsets[i] = Math.random();
-    }
+    this.updateRainAttributes(positions, sizes, randomness, fadeOffsets);
 
     // Create line geometry (two vertices per raindrop)
     const linePositions = new Float32Array(this.count * 6); // 2 points per line * 3 coordinates
@@ -66,6 +55,11 @@ export default class Rain {
     }
 
     // Set up geometries
+    this.positions = positions;
+    this.sizes = sizes;
+    this.randomness = randomness;
+    this.fadeOffsets = fadeOffsets;
+    
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
     geometry.setAttribute(
@@ -115,12 +109,44 @@ export default class Rain {
     this.scene.add(this.lines);
   }
 
+  updateRainAttributes(positions, sizes, randomness, fadeOffsets) {
+    for (let i = 0; i < this.count; i++) {
+      const i3 = i * 3;
+      positions[i3] = (Math.random() - 0.5) * Config.rain.spread.x;
+      positions[i3 + 1] = Math.random() * Config.rain.height;
+      positions[i3 + 2] = (Math.random() - 0.5) * Config.rain.spread.z;
+      sizes[i] = Config.rain.size;
+      randomness[i] = Math.random();
+      fadeOffsets[i] = Math.random();
+    }
+  }
+
+  updateUniforms() {
+    if (this.material) {
+      this.material.uniforms.uSpeed.value = Config.rain.speed;
+      this.material.uniforms.uHeight.value = Config.rain.height;
+    }
+  }
+
+  updateAttributes() {
+    if (this.points && this.positions && this.sizes) {
+      this.updateRainAttributes(this.positions, this.sizes, this.randomness, this.fadeOffsets);
+      this.points.geometry.attributes.position.needsUpdate = true;
+      this.points.geometry.attributes.size.needsUpdate = true;
+      this.lines.geometry.attributes.position.needsUpdate = true;
+      this.lines.geometry.attributes.size.needsUpdate = true;
+    }
+  }
+
   update() {
     if (!this.material) return;
 
     // Update uniforms
     this.material.uniforms.uTime.value += 0.016;
     this.material.uniforms.uPlayerPosition.value.copy(this.camera.position);
+    
+    // Update other properties from Config
+    this.updateUniforms();
   }
 
   dispose() {
