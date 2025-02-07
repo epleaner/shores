@@ -13,10 +13,10 @@ export default {
     frequency: 0.04,   // Higher frequency for more rings
     opacity: 1,        // Lower opacity for more subtle white lines
     color: '#ffffff',  // Pure white color
-    thickness: 0.001,  // Controls the thickness of the wave lines
-    noiseStrength: 5.0,    // How much the noise distorts the waves
-    noiseScale: 0.05,      // Size of the noise pattern
-    noiseSpeed: 0.2,       // Speed of noise animation
+    thickness: 0.05,  // Controls the thickness of the wave lines
+    noiseStrength: 15,    // How much the noise distorts the waves
+    noiseScale: 5,      // Size of the noise pattern
+    noiseSpeed: 0.1,       // Speed of noise animation
   },
   shootingStars: {
     spawnRate: 0.05,
@@ -51,7 +51,7 @@ export default {
       x: 300,
       z: 300,
     },
-    height: 100,
+    height: 200,
     count: 6000,
   },
 };

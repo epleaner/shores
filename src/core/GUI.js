@@ -47,7 +47,7 @@ export default class GUI {
         this.scene.waves?.material.updateUniforms();
       });
     wavesFolder
-      .add(Config.waves, 'thickness', 0.0001, 0.01)
+      .add(Config.waves, 'thickness', 0.0001, 0.1)
       .name('Line Thickness')
       .onChange(() => {
         this.scene.waves?.material.updateUniforms();
@@ -61,7 +61,7 @@ export default class GUI {
         this.scene.waves?.material.updateUniforms();
       });
     waveNoiseFolder
-      .add(Config.waves, 'noiseScale', 0.01, 0.2)
+      .add(Config.waves, 'noiseScale', 0.01, 5)
       .name('Pattern Size')
       .onChange(() => {
         this.scene.waves?.material.updateUniforms();
